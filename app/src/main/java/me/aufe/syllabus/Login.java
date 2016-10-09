@@ -3,6 +3,7 @@ package me.aufe.syllabus;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 
 public class Login extends Activity {
@@ -15,5 +16,13 @@ public class Login extends Activity {
         if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT)getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         setContentView(R.layout.activity_login);
+
+        findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RotateLoading rotateLoading = (RotateLoading) findViewById(R.id.rotate_login);
+                rotateLoading.start();
+            }
+        });
     }
 }
