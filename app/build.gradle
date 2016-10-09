@@ -27,4 +27,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
     compile project(':circleimageview')
+    compile files('libs/gson-2.2.4.jar')
+    compile files('libs/okhttp-3.4.1.jar')
+    compile files('libs/okio-1.10.0.jar')
 }
