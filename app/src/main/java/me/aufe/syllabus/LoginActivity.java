@@ -36,8 +36,8 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
                 InputMethodManager imm =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                finish();
+//                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+//                finish();
 
                 if(imm != null) {
                     imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
@@ -83,7 +83,7 @@ public class LoginActivity extends Activity {
                             @Override
                             public void onResponse(Call call, Response response) throws IOException {
 
-                                if(response.body().string()=="succeed"){
+                                if("succeed".equals(response.body().string())){
                                     handler.sendEmptyMessage(1);
                                 }else{
                                     handler.sendEmptyMessage(0);

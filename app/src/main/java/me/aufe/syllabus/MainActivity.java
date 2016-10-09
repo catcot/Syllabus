@@ -1,12 +1,13 @@
 package me.aufe.syllabus;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +109,13 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        SlidingMenu slidingMenu =new SlidingMenu(this);
+        slidingMenu.setMode(SlidingMenu.LEFT);
+        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+        slidingMenu.setFadeDegree(0.5f);
+        slidingMenu.setMenu(R.layout.menu);
+        slidingMenu.setBehindOffset(200);
+        slidingMenu.attachToActivity(this,SlidingMenu.SLIDING_CONTENT,true);
     }
 
     private void tabClicked(View v) {
