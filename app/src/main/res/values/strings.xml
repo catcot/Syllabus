@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Syllabus</string>
+    <string name="hint_sno">请输入教务帐号</string>
+    <string name="hint_pwd">请输入教务密码</string>
+    <string name="btn_login">登录</string>
 </resources>
