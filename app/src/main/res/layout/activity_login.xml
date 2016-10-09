@@ -6,14 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="me.aufe.syllabus.Login"
-    android:background="#FFFFFF"
+    android:background="#F0F0F0"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:src="@mipmap/ic_launcher"
+            app:civ_border_width="1dp"
+            app:civ_border_color="#FFFFFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="152dp"
-        android:background="#D4D4D4"
-        android:layout_margin="40dp"
+        android:background="#B8B8B8"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -26,6 +43,8 @@
                 android:layout_height="match_parent"
                 android:background="#FFFFFF"
                 android:layout_margin="5dp"
+                android:drawableLeft="@drawable/sno"
+                android:drawablePadding="10dp"
                 android:hint="@string/hint_sno"/>
 
         </LinearLayout>
@@ -41,6 +60,8 @@
                 android:layout_height="match_parent"
                 android:background="#FFFFFF"
                 android:layout_margin="5dp"
+                android:drawableLeft="@drawable/pwd"
+                android:drawablePadding="10dp"
                 android:hint="@string/hint_pwd"/>
 
         </LinearLayout>
@@ -48,7 +69,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFFFFF">
+            android:background="#F0F0F0">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp">
@@ -58,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/btn_login"
                     android:layout_marginTop="10dp"
-                    android:background="#86B850"
+                    android:background="@drawable/btn_login"
                     android:textColor="#FFFFFF"/>
             </LinearLayout>
         </LinearLayout>
@@ -68,14 +89,27 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+            <me.aufe.syllabus.RotateLoading
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/rotate_login"
+                app:loading_color="@color/colorAccent"
+                android:layout_gravity="bottom|center"/>
+        </LinearLayout>
 
-        <me.aufe.syllabus.RotateLoading
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/rotate_login"
-            app:loading_color="@color/colorAccent"
-            android:layout_gravity="bottom|center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom|center"
+            android:text="使用URP帐号登录"/>
 
     </LinearLayout>
 
