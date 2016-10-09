@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 
 public class Login extends Activity {
 
@@ -22,6 +23,10 @@ public class Login extends Activity {
             public void onClick(View v) {
                 RotateLoading rotateLoading = (RotateLoading) findViewById(R.id.rotate_login);
                 rotateLoading.start();
+                EditText sno = (EditText) findViewById(R.id.et_sno);
+                EditText pwd = (EditText) findViewById(R.id.et_pwd);
+
+
             }
         });
     }
