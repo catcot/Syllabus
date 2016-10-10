@@ -9,10 +9,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-/**
- * Created by Rex on 9/21/2016.
- */
-
 public class ScoreAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private List<ScoreData> mData;

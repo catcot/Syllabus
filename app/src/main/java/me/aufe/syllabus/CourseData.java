@@ -1,9 +1,5 @@
 package me.aufe.syllabus;
 
-/**
- * Created by Rex on 9/21/2016.
- */
-
 public class CourseData {
     private String name;
     private String org;

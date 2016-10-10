@@ -10,11 +10,4 @@
     <declare-styleable name="CradleBall">
         <attr name="cradle_ball_color" format="color" />
     </declare-styleable>
-
-    <declare-styleable name="TabItem">
-        <attr name="icon" format="reference"/>
-        <attr name="color" format="color"/>
-        <attr name="text" format="string"/>
-        <attr name="text_sie" format="dimension"/>
-    </declare-styleable>
 </resources>

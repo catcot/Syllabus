@@ -9,10 +9,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-/**
- * Created by Rex on 9/21/2016.
- */
-
 public class CourseAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private List<CourseData> mData;
@@ -47,7 +43,6 @@ public class CourseAdapter extends BaseAdapter {
             viewHolder.name = (TextView) convertView.findViewById(R.id.name);
             viewHolder.org = (TextView) convertView.findViewById(R.id.org);
             viewHolder.sno = (TextView) convertView.findViewById(R.id.sno);
-
 
             convertView.setTag(viewHolder);
 

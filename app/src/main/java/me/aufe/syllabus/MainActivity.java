@@ -48,22 +48,6 @@ public class MainActivity extends FragmentActivity {
         viewPager.setAdapter(fragmentPagerAdapter);
 
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
         SlidingMenu slidingMenu =new SlidingMenu(this);
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
@@ -79,8 +63,15 @@ public class MainActivity extends FragmentActivity {
                 editor.putString("sno","");
                 editor.putString("pwd","");
                 editor.apply();
-
                 startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                finish();
+            }
+        });
+
+        findViewById(R.id.btn_update).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,Web.class));
                 finish();
             }
         });

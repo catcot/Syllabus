@@ -113,6 +113,7 @@ public class Tab_2 extends Fragment {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
                         // TODO Auto-generated method stub
                         if("com.android.volley.TimeoutError".equals(error.toString())){
                             Toast.makeText(getContext(),"网络连接超时,成绩获取失败",Toast.LENGTH_LONG).show();
@@ -123,7 +124,6 @@ public class Tab_2 extends Fragment {
                             TextView tv = (TextView) getActivity().findViewById(R.id.tv_loading);
                             tv.setText("请检查网络连接");
                         }
-                        Toast.makeText(getContext(),error.toString(),Toast.LENGTH_LONG).show();
                     }
                 });
         mQueue.add(jsObjRequest);

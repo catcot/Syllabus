@@ -65,9 +65,7 @@ public class LoginActivity extends Activity {
 
 
         SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
-        if("".equals(pref.getString("sno",""))){
-
-        }else{
+        if(!("".equals(pref.getString("sno","")))){
             handler.sendEmptyMessage(3);
         }
 
@@ -78,15 +76,12 @@ public class LoginActivity extends Activity {
                     StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
 
-                    final String s = sno.getText().toString();
-
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             OkHttpClient client = new OkHttpClient();
-                            String url = "http://www.aufe.me/jwc/avatar.php?sno="+s;
+                            String url = "http://www.aufe.me/jwc/avatar.php?sno="+sno.getText().toString();
                             try {
-
                                 Request request = new Request.Builder().url(url).build();
                                 Response response = client.newCall(request).execute();
                                 InputStream is = response.body().byteStream();
@@ -109,7 +104,9 @@ public class LoginActivity extends Activity {
                 InputMethodManager imm =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                 rotateLoading.start();
-                boolean isLogined = readSharedPrefrence(sno.getText().toString(),pwd.getText().toString());
+                final String username = sno.getText().toString();
+                final String password = pwd.getText().toString();
+                boolean isLogined = readSharedPrefrence(username,password);
 
                 if(isLogined){
                     handler.sendEmptyMessage(1);
@@ -118,22 +115,19 @@ public class LoginActivity extends Activity {
                         @Override
                         public void run() {
                             OkHttpClient mOkHttpClient = new OkHttpClient();
-
                             final Request request = new Request.Builder()
-                                    .url("http://www.aufe.me/jwc/auth.php?sno="+sno.getText()+"&pwd="+pwd.getText())
+                                    .url("http://www.aufe.me/jwc/auth.php?sno="+username+"&pwd="+password)
                                     .build();
 
                             Call call = mOkHttpClient.newCall(request);
                             call.enqueue(new Callback() {
-
                                 @Override
                                 public void onFailure(Call call, IOException e) {
-
+                                    e.printStackTrace();
                                 }
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-
                                     if("succeed".equals(response.body().string())){
                                         handler.sendEmptyMessage(1);
                                     }else{
