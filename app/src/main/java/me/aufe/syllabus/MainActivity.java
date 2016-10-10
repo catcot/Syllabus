@@ -1,5 +1,6 @@
 package me.aufe.syllabus;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -116,6 +117,14 @@ public class MainActivity extends FragmentActivity {
         slidingMenu.setMenu(R.layout.menu);
         slidingMenu.setBehindOffset(200);
         slidingMenu.attachToActivity(this,SlidingMenu.SLIDING_CONTENT,true);
+
+        findViewById(R.id.btn_logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                finish();
+            }
+        });
     }
 
     private void tabClicked(View v) {
