@@ -3,6 +3,8 @@ package me.aufe.syllabus.Fragments;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -58,12 +60,11 @@ public class Tab_2 extends Fragment {
 
         TextView tv = (TextView) rootView.findViewById(R.id.textView_tab5);
         tv.setText(StringData());
-        listView = (ListView)rootView.findViewById(R.id.nsl);
-        listView.setAdapter(scoreAdapter);
 
         if(isReady){
-            rootView.findViewById(R.id.sc_content).setVisibility(LinearLayout.VISIBLE);
-            rootView.findViewById(R.id.sc_load).setVisibility(LinearLayout.INVISIBLE);
+
+            getActivity().findViewById(R.id.sc_content).setVisibility(LinearLayout.VISIBLE);
+            getActivity().findViewById(R.id.sc_load).setVisibility(LinearLayout.INVISIBLE);
         }
         return rootView;
     }
@@ -76,18 +77,20 @@ public class Tab_2 extends Fragment {
     }
 
     private void initData() {
-        RequestQueue mQueue = Volley.newRequestQueue(getContext());
+
         SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+        String rf = pref.getString("score","");
+        if(!("".equals(rf))){
 
-        String sno=pref.getString("sno","");
-        String url = "http://120.27.113.162/jwc/report.php?sno="+sno;
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
+            Handler handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    if(msg.what==1){
+                        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+                        String rf = pref.getString("score","");
                         JsonParser jp = new JsonParser();
-                        JsonObject jsonObject = (JsonObject) jp.parse(response.toString());
+                        JsonObject jsonObject = (JsonObject) jp.parse(rf);
                         Gson gson = new Gson();
                         Score score = gson.fromJson(jsonObject.get("1"), Score.class);
 
@@ -95,7 +98,7 @@ public class Tab_2 extends Fragment {
                         ScoreData scoreData;
                         for(int i=1;i<score.getNum();i++){
                             jp = new JsonParser();
-                            jsonObject = (JsonObject) jp.parse(response.toString());
+                            jsonObject = (JsonObject) jp.parse(rf);
                             score = gson.fromJson(jsonObject.get(i+""), Score.class);
                             scoreData = new ScoreData(score.getName(),"学分："+score.getCredit(),"分数："+score.getScore());
                             mData.add(scoreData);
@@ -107,25 +110,76 @@ public class Tab_2 extends Fragment {
                         isReady =  true;
                         getActivity().findViewById(R.id.sc_content).setVisibility(LinearLayout.VISIBLE);
                         getActivity().findViewById(R.id.sc_load).setVisibility(LinearLayout.INVISIBLE);
-
                     }
-                }, new Response.ErrorListener() {
+                }
+            };
+            Message message = new Message();
+            message.what=1;
+            handler.sendMessageDelayed(message,500);
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        // TODO Auto-generated method stub
-                        if("com.android.volley.TimeoutError".equals(error.toString())){
-                            Toast.makeText(getContext(),"网络连接超时,成绩获取失败",Toast.LENGTH_LONG).show();
-                            TextView tv = (TextView) getActivity().findViewById(R.id.tv_loading);
-                            tv.setText("网络连接超时,成绩获取失败");
-                        }else{
-                            Toast.makeText(getContext(),"请检查网络连接",Toast.LENGTH_LONG).show();
-                            TextView tv = (TextView) getActivity().findViewById(R.id.tv_loading);
-                            tv.setText("请检查网络连接");
+
+
+        }else{
+            RequestQueue mQueue = Volley.newRequestQueue(getContext());
+
+            String sno=pref.getString("sno","");
+            String url = "http://120.27.113.162/jwc/report.php?sno="+sno;
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+
+                            SharedPreferences.Editor editor = getActivity().getSharedPreferences("data",MODE_PRIVATE).edit();
+                            editor.putString("score",response.toString());
+                            editor.putBoolean("isReady",true);
+                            editor.apply();
+                            editor.commit();
+
+
+                            JsonParser jp = new JsonParser();
+                            JsonObject jsonObject = (JsonObject) jp.parse(response.toString());
+                            Gson gson = new Gson();
+                            Score score = gson.fromJson(jsonObject.get("1"), Score.class);
+
+                            mData = new ArrayList<ScoreData>();
+                            ScoreData scoreData;
+                            for(int i=1;i<score.getNum();i++){
+                                jp = new JsonParser();
+                                jsonObject = (JsonObject) jp.parse(response.toString());
+                                score = gson.fromJson(jsonObject.get(i+""), Score.class);
+                                scoreData = new ScoreData(score.getName(),"学分："+score.getCredit(),"分数："+score.getScore());
+                                mData.add(scoreData);
+                            }
+
+                            scoreAdapter = new ScoreAdapter(getContext(),mData);
+                            listView = (ListView) getActivity().findViewById(R.id.nsl);
+                            listView.setAdapter(scoreAdapter);
+                            isReady =  true;
+                            getActivity().findViewById(R.id.sc_content).setVisibility(LinearLayout.VISIBLE);
+                            getActivity().findViewById(R.id.sc_load).setVisibility(LinearLayout.INVISIBLE);
+
                         }
-                    }
-                });
-        mQueue.add(jsObjRequest);
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                            // TODO Auto-generated method stub
+                            if("com.android.volley.TimeoutError".equals(error.toString())){
+                                Toast.makeText(getContext(),"网络连接超时,成绩获取失败",Toast.LENGTH_LONG).show();
+                                TextView tv = (TextView) getActivity().findViewById(R.id.tv_loading);
+                                tv.setText("网络连接超时,成绩获取失败");
+                            }else{
+                                Toast.makeText(getContext(),"请检查网络连接",Toast.LENGTH_LONG).show();
+                                TextView tv = (TextView) getActivity().findViewById(R.id.tv_loading);
+                                tv.setText("请检查网络连接");
+                            }
+                        }
+                    });
+            mQueue.add(jsObjRequest);
+        }
+
+
     }
 }

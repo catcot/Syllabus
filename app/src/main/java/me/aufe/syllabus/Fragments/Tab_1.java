@@ -4,28 +4,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.baoyz.widget.PullRefreshLayout;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-
-import org.json.JSONObject;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,81 +43,57 @@ public class Tab_1 extends Fragment {
     private final int REFRESH_COMPLETE = 5;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        final RequestQueue mQueue = Volley.newRequestQueue(getContext());
+    public void onResume() {
+        super.onResume();
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+        MaterialCalendarView materialCalendarView = (MaterialCalendarView) getActivity().findViewById(R.id.calendarView);
+        materialCalendarView.setDateSelected(materialCalendarView.getSelectedDate().getCalendar(),false);
+        materialCalendarView.setDateSelected(c,true);
+        changeList(c);
 
-        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
-
-        String sno=pref.getString("sno","");
-        String pwd=pref.getString("pwd","");
-        int today = getWeek(c.get(Calendar.YEAR),c.get(Calendar.MONTH)+1,c.get(Calendar.DAY_OF_MONTH));
-        String url = "http://120.27.113.162/jwc/table_today.php?sno="+sno+"&pwd="+pwd+"&w="+today;
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        mData=null;
-                        mData = new ArrayList<CourseData>();
-                        CourseData courseData;
-                        JsonParser jp = new JsonParser();
-                        JsonObject jsonObject = (JsonObject) jp.parse(response.toString());
-                        Gson gson = new Gson();
-                        Course course;
-
-                        course = gson.fromJson(jsonObject.get("one"), Course.class);
-                        if(course!=null){
-                            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-                            mData.add(courseData);
-                        }
-                        course = gson.fromJson(jsonObject.get("two"), Course.class);
-                        if(course!=null){
-                            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-                            mData.add(courseData);
-                        }
-                        course = gson.fromJson(jsonObject.get("three"), Course.class);
-                        if(course!=null){
-                            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-                            mData.add(courseData);
-                        }
-                        course = gson.fromJson(jsonObject.get("four"), Course.class);
-                        if(course!=null){
-                            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-                            mData.add(courseData);
-                        }
-                        course = gson.fromJson(jsonObject.get("five"), Course.class);
-                        if(course!=null){
-                            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-                            mData.add(courseData);
-                        }
-                        courseAdapter = new CourseAdapter(getContext(),mData);
-                        listView = (ListView) getActivity().findViewById(R.id.listView);
-                        listView.setAdapter(courseAdapter);
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        // TODO Auto-generated method stub
-                        if("com.android.volley.TimeoutError".equals(error.toString())){
-                            Toast.makeText(getContext(),"网络连接超时,课表加载失败",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        mQueue.add(jsObjRequest);
+        getActivity().findViewById(R.id.app_bar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+                MaterialCalendarView materialCalendarView = (MaterialCalendarView) getActivity().findViewById(R.id.calendarView);
+                materialCalendarView.setDateSelected(materialCalendarView.getSelectedDate().getCalendar(),false);
+                materialCalendarView.setDateSelected(c,true);
+                changeList(c);
+            }
+        });
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.tab_1,container,false);
+        final View v = inflater.inflate(R.layout.tab_1,container,false);
         MaterialCalendarView materialCalendarView = (MaterialCalendarView) v.findViewById(R.id.calendarView);
+        materialCalendarView.setSelectionColor(0xFF1A89F3);
         materialCalendarView.state().edit()
                 .setCalendarDisplayMode(CalendarMode.WEEKS)
                 .commit();
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+        materialCalendarView.setDateSelected(c,true);
+        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                Calendar c = date.getCalendar();
+                c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+
+                SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+                String re="";
+
+                changeList(c);
+
+                //Toast.makeText(getActivity(),c.get(Calendar.MONTH)+1+"-"+c.get(Calendar.DAY_OF_MONTH)+"-"+(c.get(Calendar.DAY_OF_WEEK)-1),Toast.LENGTH_LONG).show();
+
+
+            }
+        });
         final PullRefreshLayout layout = (PullRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
         final Handler handler = new Handler(){
             @Override
@@ -138,8 +110,126 @@ public class Tab_1 extends Fragment {
                 handler.sendEmptyMessageDelayed(REFRESH_COMPLETE,3000);
             }
         });
+
+
+
+        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+        String re= pref.getString("aa","1");
+        mData=null;
+        mData = new ArrayList<CourseData>();
+        CourseData courseData;
+        JsonParser jp = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jp.parse(re);
+        Gson gson = new Gson();
+        Course course;
+
+        course = gson.fromJson(jsonObject.get("one"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("two"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("three"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("four"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("five"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        courseAdapter = new CourseAdapter(getContext(),mData);
+        listView = (ListView) v.findViewById(R.id.listView);
+        listView.setAdapter(courseAdapter);
         return v;
     }
+
+    private void changeList(Calendar c) {
+        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+        String re="";
+        switch (c.get(Calendar.DAY_OF_WEEK)-1){
+            case 1:
+                re= pref.getString("aa","1");
+                break;
+            case 2:
+                re= pref.getString("bb","1");
+                break;
+            case 3:
+                re= pref.getString("cc","1");
+                break;
+            case 4:
+                re= pref.getString("dd","1");
+                break;
+            case 5:
+                re= pref.getString("ee","1");
+                break;
+            case 6:
+                re= pref.getString("ff","1");
+                break;
+            case 0:
+                re= pref.getString("gg","1");
+                break;
+
+        }
+
+        mData=null;
+        mData = new ArrayList<CourseData>();
+        CourseData courseData;
+        JsonParser jp = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jp.parse(re);
+        Gson gson = new Gson();
+        Course course;
+
+        course = gson.fromJson(jsonObject.get("one"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("two"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("three"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("four"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        course = gson.fromJson(jsonObject.get("five"), Course.class);
+        if(course!=null){
+            Log.d("course",course.getName());
+            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+            mData.add(courseData);
+        }
+        courseAdapter = new CourseAdapter(getContext(),mData);
+        listView = (ListView) getActivity().findViewById(R.id.listView);
+        listView.setAdapter(courseAdapter);
+    }
+
     public String praseCourseTime(String s){
         String result=null;
         switch (s){

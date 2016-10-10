@@ -66,6 +66,7 @@
                 android:layout_gravity="center"
                 android:gravity="center">
                 <ImageView
+                    android:id="@+id/qcode"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_marginLeft="10dp"
@@ -75,25 +76,12 @@
 
         </LinearLayout>
 
-
-        <Button
-            android:id="@+id/btn_update"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="9dp"
-            android:layout_marginRight="9dp"
-            android:layout_marginBottom="5dp"
-            android:text="检 查 更 新"
-            android:background="@drawable/btn_update"
-            android:textColor="#FFFFFF"/>
-
         <Button
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_gravity="bottom"
+            android:layout_marginTop="20dp"
             android:layout_marginLeft="9dp"
             android:layout_marginRight="9dp"
             android:layout_marginBottom="5dp"

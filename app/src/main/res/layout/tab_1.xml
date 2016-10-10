@@ -6,11 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/container">
     <View
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:background="#FE17A05E"/>
+        android:background="#FE1AB3FC"/>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

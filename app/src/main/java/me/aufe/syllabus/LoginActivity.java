@@ -11,12 +11,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -39,19 +39,18 @@ public class LoginActivity extends Activity {
         final EditText pwd = (EditText) findViewById(R.id.et_pwd);
         final RotateLoading rotateLoading = (RotateLoading) findViewById(R.id.rotate_login);
         final CircleImageView imageView = (CircleImageView) findViewById(R.id.avatar);
-        final Handler handler = new Handler(){
+        final  Handler handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 if(msg.obj!=null){
                     imageView.setImageBitmap((Bitmap) msg.obj);
-                }else if(msg.what==1){
-                    rotateLoading.stop();
+                }else if(msg.what==1) {
+                            rotateLoading.stop();
+                            writeSharedPrefrence(sno.getText().toString(), pwd.getText().toString());
 
-                    writeSharedPrefrence(sno.getText().toString(),pwd.getText().toString());
-
-                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                    finish();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
                 }else if(msg.what==2){
                     rotateLoading.stop();
                     Toast.makeText(LoginActivity.this,"Login Failed",Toast.LENGTH_LONG).show();
@@ -116,7 +115,7 @@ public class LoginActivity extends Activity {
                         public void run() {
                             OkHttpClient mOkHttpClient = new OkHttpClient();
                             final Request request = new Request.Builder()
-                                    .url("http://www.aufe.me/jwc/auth.php?sno="+username+"&pwd="+password)
+                                    .url("http://www.aufe.me/jwc/table_all.php?sno="+username+"&pwd="+password)
                                     .build();
 
                             Call call = mOkHttpClient.newCall(request);
@@ -128,11 +127,20 @@ public class LoginActivity extends Activity {
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-                                    if("succeed".equals(response.body().string())){
-                                        handler.sendEmptyMessage(1);
-                                    }else{
-                                        handler.sendEmptyMessage(2);
+
+                                    String[] r = response.body().string().split("\\|");
+                                    SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+                                    String[] list = {"aa","bb","cc","dd","ee","ff","gg"};
+                                    for(int i=0;i<7;i++){
+                                        Log.d("hr",r[i]);
+                                        editor.putString(list[i],r[i]);
                                     }
+                                    editor.apply();
+                                    editor.commit();
+
+
+
+                                    handler.sendEmptyMessage(1);
                                 }
                             });
                         }
