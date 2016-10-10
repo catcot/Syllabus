@@ -130,7 +130,7 @@ public class LoginActivity extends Activity {
 
                                     String[] r = response.body().string().split("\\|");
                                     SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
-                                    String[] list = {"aa","bb","cc","dd","ee","ff","gg"};
+                                    String[] list = {"MON","TUE","WED","THU","FRI","SAT","SUN"};
                                     for(int i=0;i<7;i++){
                                         Log.d("hr",r[i]);
                                         editor.putString(list[i],r[i]);

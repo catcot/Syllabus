@@ -6,13 +6,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.baoyz.widget.PullRefreshLayout;
 import com.google.gson.Gson;
@@ -23,6 +24,7 @@ import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -32,6 +34,11 @@ import me.aufe.syllabus.Course;
 import me.aufe.syllabus.CourseAdapter;
 import me.aufe.syllabus.CourseData;
 import me.aufe.syllabus.R;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -83,14 +90,7 @@ public class Tab_1 extends Fragment {
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 Calendar c = date.getCalendar();
                 c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-
-                SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
-                String re="";
-
                 changeList(c);
-
-                //Toast.makeText(getActivity(),c.get(Calendar.MONTH)+1+"-"+c.get(Calendar.DAY_OF_MONTH)+"-"+(c.get(Calendar.DAY_OF_WEEK)-1),Toast.LENGTH_LONG).show();
-
 
             }
         });
@@ -107,55 +107,53 @@ public class Tab_1 extends Fragment {
         layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                handler.sendEmptyMessageDelayed(REFRESH_COMPLETE,3000);
+                SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+                final String username = pref.getString("sno","");
+                final String password = pref.getString("pwd","");
+
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        OkHttpClient mOkHttpClient = new OkHttpClient();
+                        final Request request = new Request.Builder()
+                                .url("http://www.aufe.me/jwc/table_all.php?sno="+username+"&pwd="+password)
+                                .build();
+
+                        Call call = mOkHttpClient.newCall(request);
+                        call.enqueue(new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                                e.printStackTrace();
+                                LinearLayout l = (LinearLayout)getActivity().findViewById(R.id.activity_main);
+                                Snackbar snackbar = Snackbar.make(l, "Regresh Failed", 1000);
+                                snackbar.getView().setBackgroundColor(0xFF00BFFF);
+                                snackbar.show();
+                                handler.sendEmptyMessage(REFRESH_COMPLETE);
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+
+                                String[] r = response.body().string().split("\\|");
+                                SharedPreferences.Editor editor = getActivity().getSharedPreferences("data",MODE_PRIVATE).edit();
+                                String[] list = {"MON","TUE","WED","THU","FRI","SAT","SUN"};
+                                for(int i=0;i<7;i++){
+                                    editor.putString(list[i],r[i]);
+                                }
+                                editor.apply();
+                                editor.commit();
+                                LinearLayout l = (LinearLayout)getActivity().findViewById(R.id.activity_main);
+                                Snackbar snackbar = Snackbar.make(l, "Regresh Complete", 1000);
+                                snackbar.getView().setBackgroundColor(0xFF00BFFF);
+                                snackbar.show();
+                                handler.sendEmptyMessage(REFRESH_COMPLETE);
+                            }
+                        });
+                    }
+                }).start();
             }
         });
-
-
-
-        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
-        String re= pref.getString("aa","1");
-        mData=null;
-        mData = new ArrayList<CourseData>();
-        CourseData courseData;
-        JsonParser jp = new JsonParser();
-        JsonObject jsonObject = (JsonObject) jp.parse(re);
-        Gson gson = new Gson();
-        Course course;
-
-        course = gson.fromJson(jsonObject.get("one"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("two"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("three"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("four"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("five"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        courseAdapter = new CourseAdapter(getContext(),mData);
-        listView = (ListView) v.findViewById(R.id.listView);
-        listView.setAdapter(courseAdapter);
         return v;
     }
 
@@ -164,25 +162,25 @@ public class Tab_1 extends Fragment {
         String re="";
         switch (c.get(Calendar.DAY_OF_WEEK)-1){
             case 1:
-                re= pref.getString("aa","1");
+                re= pref.getString("MON","1");
                 break;
             case 2:
-                re= pref.getString("bb","1");
+                re= pref.getString("TUE","1");
                 break;
             case 3:
-                re= pref.getString("cc","1");
+                re= pref.getString("WED","1");
                 break;
             case 4:
-                re= pref.getString("dd","1");
+                re= pref.getString("THU","1");
                 break;
             case 5:
-                re= pref.getString("ee","1");
+                re= pref.getString("FRI","1");
                 break;
             case 6:
-                re= pref.getString("ff","1");
+                re= pref.getString("SAT","1");
                 break;
             case 0:
-                re= pref.getString("gg","1");
+                re= pref.getString("SUN","1");
                 break;
 
         }
@@ -270,15 +268,5 @@ public class Tab_1 extends Fragment {
                 result = "下午 13:30 - 18:00";
         }
         return result;
-    }
-
-    public int getWeek(int year, int month, int dayOfMonth){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month-1, dayOfMonth);
-        int a =  calendar.get(Calendar.DAY_OF_WEEK)-1;
-        if(a==0){
-            a=7;
-        }
-        return a;
     }
 }
