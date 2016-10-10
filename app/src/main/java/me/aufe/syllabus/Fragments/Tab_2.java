@@ -80,7 +80,6 @@ public class Tab_2 extends Fragment {
         SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
 
         String sno=pref.getString("sno","");
-        String pwd=pref.getString("pwd","");
         String url = "http://120.27.113.162/jwc/report.php?sno="+sno;
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {

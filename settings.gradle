@@ -1,1 +1,1 @@
-include ':app', ':circleimageview', ':slidingmenu', ':calendar'
+include ':app', ':circleimageview', ':slidingmenu', ':calendar', ':refresh'

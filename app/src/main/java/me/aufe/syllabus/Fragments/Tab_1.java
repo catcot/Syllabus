@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.baoyz.widget.PullRefreshLayout;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -49,6 +50,8 @@ public class Tab_1 extends Fragment {
         c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
 
         SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+
+
 
         String sno=pref.getString("sno","");
         String pwd=pref.getString("pwd","");
@@ -119,6 +122,18 @@ public class Tab_1 extends Fragment {
         materialCalendarView.state().edit()
                 .setCalendarDisplayMode(CalendarMode.WEEKS)
                 .commit();
+        PullRefreshLayout layout = (PullRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+
+        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // start refresh
+            }
+        });
+
+        layout.setRefreshing(false);
+
+
         return v;
     }
     public String praseCourseTime(String s){

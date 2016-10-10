@@ -30,23 +30,34 @@
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView
+    <com.baoyz.widget.PullRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/tab_1">
+        tools:showIn="@layout/tab_1"
+        >
 
-        <me.aufe.syllabus.NoScrollListView
+        <!-- ListView、ScrollView、RecyclerView、Other -->
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView"
-            android:layout_margin="5dp"
-            android:dividerHeight="5dp"
-            android:divider="#FFFFFF">
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:showIn="@layout/tab_1">
 
-        </me.aufe.syllabus.NoScrollListView>
+            <me.aufe.syllabus.NoScrollListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView"
+                android:layout_margin="5dp"
+                android:dividerHeight="5dp"
+                android:divider="#FFFFFF">
 
-    </android.support.v4.widget.NestedScrollView>
+            </me.aufe.syllabus.NoScrollListView>
+
+        </android.support.v4.widget.NestedScrollView>
+    </com.baoyz.widget.PullRefreshLayout>
+
+
 
 </android.support.design.widget.CoordinatorLayout>
