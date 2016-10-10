@@ -1,6 +1,5 @@
 package me.aufe.syllabus;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -35,8 +34,6 @@ public class MainActivity extends FragmentActivity {
 
         fragments.add(new Tab_1());
         fragments.add(new Tab_2());
-        fragments.add(new Tab_3());
-        fragments.add(new Tab_4());
 
         fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -50,53 +47,12 @@ public class MainActivity extends FragmentActivity {
             }
         };
 
-        TabItem one = (TabItem) findViewById(R.id.tab_1);
-        one.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tabClicked(v);
-            }
-        });
-        tabs.add(one);
-        TabItem two = (TabItem) findViewById(R.id.tab_2);
-        two.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tabClicked(v);
-            }
-        });
-        tabs.add(two);
-        TabItem three = (TabItem) findViewById(R.id.tab_3);
-        three.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tabClicked(v);
-            }
-        });
-        tabs.add(three);
-        TabItem four = (TabItem) findViewById(R.id.tab_4);
-        four.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tabClicked(v);
-            }
-        });
-        tabs.add(four);
         viewPager.setAdapter(fragmentPagerAdapter);
 
-
-
-        one.setIconAlpha(1.0f);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(positionOffset>0){
-                    TabItem left = tabs.get(position);
-                    TabItem right = tabs.get(position+1);
-                    left.setIconAlpha(1-positionOffset);
-                    right.setIconAlpha(positionOffset);
-                }
             }
 
             @Override
@@ -117,41 +73,5 @@ public class MainActivity extends FragmentActivity {
         slidingMenu.setMenu(R.layout.menu);
         slidingMenu.setBehindOffset(200);
         slidingMenu.attachToActivity(this,SlidingMenu.SLIDING_CONTENT,true);
-
-        findViewById(R.id.btn_logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,LoginActivity.class));
-                finish();
-            }
-        });
-    }
-
-    private void tabClicked(View v) {
-        resetOthers();
-        switch (v.getId()){
-            case R.id.tab_1:
-                tabs.get(0).setIconAlpha(1.0f);
-                viewPager.setCurrentItem(0,false);
-                break;
-            case R.id.tab_2:
-                tabs.get(1).setIconAlpha(1.0f);
-                viewPager.setCurrentItem(1,false);
-                break;
-            case R.id.tab_3:
-                tabs.get(2).setIconAlpha(1.0f);
-                viewPager.setCurrentItem(2,false);
-                break;
-            case R.id.tab_4:
-                tabs.get(3).setIconAlpha(1.0f);
-                viewPager.setCurrentItem(3,false);
-                break;
-        }
-    }
-
-    private void resetOthers() {
-        for(int i=0;i<tabs.size();i++){
-            tabs.get(i).setIconAlpha(0);
-        }
     }
 }

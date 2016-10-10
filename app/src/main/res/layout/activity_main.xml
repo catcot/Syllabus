@@ -16,48 +16,4 @@
 
     </android.support.v4.view.ViewPager>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_tab">
-        <me.aufe.syllabus.TabItem
-            android:id="@+id/tab_1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:icon="@drawable/ic_tab_1"
-            app:text="one"
-            app:color="#313133"
-            app:text_sie="10sp"/>
-        <me.aufe.syllabus.TabItem
-            android:id="@+id/tab_2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:icon="@drawable/ic_tab_2"
-            app:text="two"
-            app:color="#313133"
-            app:text_sie="10sp"/>
-        <me.aufe.syllabus.TabItem
-            android:id="@+id/tab_3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:icon="@drawable/ic_tab_3"
-            app:text="three"
-            app:color="#313133"
-            app:text_sie="10sp"/>
-        <me.aufe.syllabus.TabItem
-            android:id="@+id/tab_4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:icon="@drawable/ic_tab_4"
-            app:text="four"
-            app:color="#313133"
-            app:text_sie="10sp"/>
-
-    </LinearLayout>
-
 </LinearLayout>
