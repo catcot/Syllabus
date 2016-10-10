@@ -1,5 +1,7 @@
 package me.aufe.syllabus;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,16 +16,12 @@ import java.util.List;
 
 import me.aufe.syllabus.Fragments.Tab_1;
 import me.aufe.syllabus.Fragments.Tab_2;
-import me.aufe.syllabus.Fragments.Tab_3;
-import me.aufe.syllabus.Fragments.Tab_4;
 
 public class MainActivity extends FragmentActivity {
 
     private ViewPager viewPager;
     private List<Fragment> fragments = new ArrayList<Fragment>();
     private FragmentPagerAdapter fragmentPagerAdapter;
-
-    private List<TabItem> tabs = new ArrayList<TabItem>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,5 +71,18 @@ public class MainActivity extends FragmentActivity {
         slidingMenu.setMenu(R.layout.menu);
         slidingMenu.setBehindOffset(200);
         slidingMenu.attachToActivity(this,SlidingMenu.SLIDING_CONTENT,true);
+
+        findViewById(R.id.btn_logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+                editor.putString("sno","");
+                editor.putString("pwd","");
+                editor.apply();
+
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                finish();
+            }
+        });
     }
 }

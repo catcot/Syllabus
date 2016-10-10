@@ -1,13 +1,12 @@
 package me.aufe.syllabus.Fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -34,26 +33,25 @@ import me.aufe.syllabus.Course;
 import me.aufe.syllabus.CourseAdapter;
 import me.aufe.syllabus.CourseData;
 import me.aufe.syllabus.R;
+
+import static android.content.Context.MODE_PRIVATE;
+
 public class Tab_1 extends Fragment {
     private ListView listView;
     private List<CourseData> mData;
     private CourseAdapter courseAdapter;
-    FloatingActionButton floatingActionButton;
-    CalendarView calendarView;
-    String m =  null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final RequestQueue mQueue = Volley.newRequestQueue(getContext());
-
-
-
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
 
-        String sno="20143461";
-        String pwd="REWQNK";
+        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+
+        String sno=pref.getString("sno","");
+        String pwd=pref.getString("pwd","");
 
         int ww = getWeek(c.get(Calendar.YEAR),c.get(Calendar.MONTH)+1,c.get(Calendar.DAY_OF_MONTH));
         String url1 = "http://120.27.113.162/jwc/table_today.php?sno="+sno+"&pwd="+pwd+"&w="+ww;
@@ -108,12 +106,9 @@ public class Tab_1 extends Fragment {
                             Toast.makeText(getContext(),"网络连接超时,课表加载失败",Toast.LENGTH_LONG).show();
                         }
                         Toast.makeText(getContext(),error.toString(),Toast.LENGTH_LONG).show();
-
                     }
                 });
         mQueue.add(jsObjRequest);
-
-
     }
 
     @Nullable
@@ -126,9 +121,6 @@ public class Tab_1 extends Fragment {
                 .commit();
         return v;
     }
-
-
-
     public String praseCourseTime(String s){
         String result=null;
         switch (s){
@@ -172,8 +164,8 @@ public class Tab_1 extends Fragment {
     }
 
     public int getWeek(int year, int month, int dayOfMonth){
-        Calendar calendar = Calendar.getInstance();//获得一个日历
-        calendar.set(year, month-1, dayOfMonth);//设置当前时间,月份是从0月开始计算
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month-1, dayOfMonth);
         int a =  calendar.get(Calendar.DAY_OF_WEEK)-1;
         if(a==0){
             a=7;

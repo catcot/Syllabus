@@ -3,6 +3,7 @@ package me.aufe.syllabus;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -31,9 +32,6 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        //make status bar transparent
         if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.KITKAT)getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         setContentView(R.layout.activity_login);
@@ -49,14 +47,30 @@ public class LoginActivity extends Activity {
                     imageView.setImageBitmap((Bitmap) msg.obj);
                 }else if(msg.what==1){
                     rotateLoading.stop();
+
+                    writeSharedPrefrence(sno.getText().toString(),pwd.getText().toString());
+
                     startActivity(new Intent(LoginActivity.this,MainActivity.class));
                     finish();
                 }else if(msg.what==2){
                     rotateLoading.stop();
                     Toast.makeText(LoginActivity.this,"Login Failed",Toast.LENGTH_LONG).show();
+                }else if(msg.what==3){
+                    rotateLoading.stop();
+                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                    finish();
                 }
             }
         };
+
+
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        if("".equals(pref.getString("sno",""))){
+
+        }else{
+            handler.sendEmptyMessage(3);
+        }
+
         pwd.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -80,7 +94,6 @@ public class LoginActivity extends Activity {
                                 Message message =  new Message();
                                 message.obj =  bm;
                                 handler.sendMessage(message);
-                                //imageView.setImageBitmap(bm);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -95,39 +108,59 @@ public class LoginActivity extends Activity {
             public void onClick(View v) {
                 InputMethodManager imm =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-
                 rotateLoading.start();
+                boolean isLogined = readSharedPrefrence(sno.getText().toString(),pwd.getText().toString());
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        OkHttpClient mOkHttpClient = new OkHttpClient();
+                if(isLogined){
+                    handler.sendEmptyMessage(1);
+                }else{
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OkHttpClient mOkHttpClient = new OkHttpClient();
 
-                        final Request request = new Request.Builder()
-                                .url("http://www.aufe.me/jwc/auth.php?sno="+sno.getText()+"&pwd="+pwd.getText())
-                                .build();
+                            final Request request = new Request.Builder()
+                                    .url("http://www.aufe.me/jwc/auth.php?sno="+sno.getText()+"&pwd="+pwd.getText())
+                                    .build();
 
-                        Call call = mOkHttpClient.newCall(request);
-                        call.enqueue(new Callback() {
+                            Call call = mOkHttpClient.newCall(request);
+                            call.enqueue(new Callback() {
 
-                            @Override
-                            public void onFailure(Call call, IOException e) {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
 
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-
-                                if("succeed".equals(response.body().string())){
-                                    handler.sendEmptyMessage(1);
-                                }else{
-                                    handler.sendEmptyMessage(2);
                                 }
-                            }
-                        });
-                    }
-                }).start();
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+
+                                    if("succeed".equals(response.body().string())){
+                                        handler.sendEmptyMessage(1);
+                                    }else{
+                                        handler.sendEmptyMessage(2);
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
+                }
             }
         });
+    }
+
+    private boolean readSharedPrefrence(String s, String s1) {
+        boolean result = false;
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        if(s.equals(pref.getString("sno","")) && s1.equals(pref.getString("pwd",""))){
+            result = true;
+        }
+        return result;
+    }
+
+    private void writeSharedPrefrence(String text, String pwdText) {
+        SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+        editor.putString("sno",text);
+        editor.putString("pwd",pwdText);
+        editor.apply();
     }
 }

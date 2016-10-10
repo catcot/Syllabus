@@ -1,7 +1,5 @@
 package me.aufe.syllabus.Fragments;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,31 +24,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import me.aufe.syllabus.LoginActivity;
 import me.aufe.syllabus.R;
 import me.aufe.syllabus.Score;
 import me.aufe.syllabus.ScoreAdapter;
 import me.aufe.syllabus.ScoreData;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class Tab_2 extends Fragment {
     private ListView listView;
     private List<ScoreData> mData;
     private ScoreAdapter scoreAdapter;
     private boolean isReady=false;
-
-    private String filePath;
-    private int progress;
-    private File apkFile;
-    private static final int DOWNLOADING = 1;
-    private static final int DOWNLOAD_FINSHED = 2;
-
-    String apkPath;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,7 +77,10 @@ public class Tab_2 extends Fragment {
 
     private void initData() {
         RequestQueue mQueue = Volley.newRequestQueue(getContext());
-        String sno = "20143461";
+        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
+
+        String sno=pref.getString("sno","");
+        String pwd=pref.getString("pwd","");
         String url = "http://120.27.113.162/jwc/report.php?sno="+sno;
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
