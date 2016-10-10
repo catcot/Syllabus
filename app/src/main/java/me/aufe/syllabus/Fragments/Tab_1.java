@@ -2,6 +2,8 @@ package me.aufe.syllabus.Fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,6 +44,8 @@ public class Tab_1 extends Fragment {
     private List<CourseData> mData;
     private CourseAdapter courseAdapter;
 
+    private final int REFRESH_COMPLETE = 5;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,15 +55,12 @@ public class Tab_1 extends Fragment {
 
         SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
 
-
-
         String sno=pref.getString("sno","");
         String pwd=pref.getString("pwd","");
-
-        int ww = getWeek(c.get(Calendar.YEAR),c.get(Calendar.MONTH)+1,c.get(Calendar.DAY_OF_MONTH));
-        String url1 = "http://120.27.113.162/jwc/table_today.php?sno="+sno+"&pwd="+pwd+"&w="+ww;
+        int today = getWeek(c.get(Calendar.YEAR),c.get(Calendar.MONTH)+1,c.get(Calendar.DAY_OF_MONTH));
+        String url = "http://120.27.113.162/jwc/table_today.php?sno="+sno+"&pwd="+pwd+"&w="+today;
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url1, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -101,14 +102,13 @@ public class Tab_1 extends Fragment {
                         listView.setAdapter(courseAdapter);
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
                         // TODO Auto-generated method stub
                         if("com.android.volley.TimeoutError".equals(error.toString())){
                             Toast.makeText(getContext(),"网络连接超时,课表加载失败",Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(getContext(),error.toString(),Toast.LENGTH_LONG).show();
                     }
                 });
         mQueue.add(jsObjRequest);
@@ -122,18 +122,22 @@ public class Tab_1 extends Fragment {
         materialCalendarView.state().edit()
                 .setCalendarDisplayMode(CalendarMode.WEEKS)
                 .commit();
-        PullRefreshLayout layout = (PullRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
-
+        final PullRefreshLayout layout = (PullRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+        final Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(msg.what==REFRESH_COMPLETE){
+                    layout.setRefreshing(false);
+                }
+            }
+        };
         layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // start refresh
+                handler.sendEmptyMessageDelayed(REFRESH_COMPLETE,3000);
             }
         });
-
-        layout.setRefreshing(false);
-
-
         return v;
     }
     public String praseCourseTime(String s){
