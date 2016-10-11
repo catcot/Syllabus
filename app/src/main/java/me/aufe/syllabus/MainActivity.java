@@ -45,10 +45,8 @@ public class MainActivity extends FragmentActivity {
 
 
     private String filePath;
-    private int progress;
     private File apkFile;
-    private static final int DOWNLOADING = 1;
-    private static final int DOWNLOAD_FINSHED = 2;
+    private static final int CURRENT_VERSION = 1;
 
     String apkPath;
 
@@ -88,9 +86,17 @@ public class MainActivity extends FragmentActivity {
         findViewById(R.id.btn_logout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Reset all prefrence data
                 SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
                 editor.putString("sno","");
                 editor.putString("pwd","");
+                String[] list = {"MON","TUE","WED","THU","FRI","SAT","SUN"};
+                for(int i=0;i<7;i++){
+                    editor.putString(list[i],"");
+                }
+                editor.putString("score","");
+                editor.putBoolean("isReady",false);
+
                 editor.apply();
                 startActivity(new Intent(MainActivity.this,LoginActivity.class));
                 finish();
@@ -136,8 +142,8 @@ public class MainActivity extends FragmentActivity {
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if(Integer.parseInt(response.body().string())>1){
-                    downloadApk("http://www.aufe.me/app/down/thincourse_v1.0.2.apk");
+                if(Integer.parseInt(response.body().string())> CURRENT_VERSION){
+                    downloadApk("http://www.aufe.me/app/down/syllabus_latest.apk");
                 }
             }
         });
@@ -158,7 +164,7 @@ public class MainActivity extends FragmentActivity {
                 try{
                     if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                         String sdPath =  Environment.getExternalStorageDirectory()+"/";
-                        filePath =  sdPath+"thincourse";
+                        filePath =  sdPath+"syllabus";
 
                         File dir = new File(filePath);
                         if(!dir.exists()){
