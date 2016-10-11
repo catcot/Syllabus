@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.LinearLayout;
+
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +35,7 @@ import okhttp3.Response;
 public class MainActivity extends FragmentActivity {
     private String filePath;
     private File apkFile;
-    private static final int CURRENT_VERSION = 1;
+    private static final int CURRENT_VERSION = 2;
     private static final int READY_FOR_INSTALL = 2;
 
     @Override
@@ -129,6 +130,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(Integer.parseInt(response.body().string())> CURRENT_VERSION){
+                    handler.sendEmptyMessage(9);
                     downloadApk("http://www.aufe.me/app/down/syllabus_latest.apk");
                 }
             }
@@ -150,6 +152,10 @@ public class MainActivity extends FragmentActivity {
                     if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                         String sdPath =  Environment.getExternalStorageDirectory()+"/";
                         filePath =  sdPath+"syllabus";
+                        File dir = new File(filePath);
+                        if(!dir.exists()){
+                            dir.mkdir();
+                        }
                         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
                         conn.connect();
                         InputStream is = conn.getInputStream();
