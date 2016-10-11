@@ -35,7 +35,7 @@ import okhttp3.Response;
 public class MainActivity extends FragmentActivity {
     private String filePath;
     private File apkFile;
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
     private static final int READY_FOR_INSTALL = 2;
 
     @Override
