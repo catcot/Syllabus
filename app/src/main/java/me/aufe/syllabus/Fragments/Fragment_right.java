@@ -38,7 +38,7 @@ import me.aufe.syllabus.ScoreData;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Tab_2 extends Fragment {
+public class Fragment_right extends Fragment {
     private ListView listView;
     private List<ScoreData> mData;
     private ScoreAdapter scoreAdapter;
@@ -56,7 +56,7 @@ public class Tab_2 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.tab_2, container, false);
+        View rootView = inflater.inflate(R.layout.pager_right, container, false);
 
         TextView tv = (TextView) rootView.findViewById(R.id.textView_tab5);
         tv.setText(StringData());
@@ -134,7 +134,6 @@ public class Tab_2 extends Fragment {
                             editor.putString("score",response.toString());
                             editor.putBoolean("isReady",true);
                             editor.apply();
-                            editor.commit();
 
 
                             JsonParser jp = new JsonParser();

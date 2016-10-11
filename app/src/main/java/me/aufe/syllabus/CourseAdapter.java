@@ -37,7 +37,7 @@ public class CourseAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         if(convertView == null){
-            convertView = layoutInflater.inflate(R.layout.list_item,parent,false);
+            convertView = layoutInflater.inflate(R.layout.list_item_course_list,parent,false);
             viewHolder = new ViewHolder();
 
             viewHolder.name = (TextView) convertView.findViewById(R.id.name);

@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,7 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -42,13 +42,8 @@ import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Tab_1 extends Fragment {
-    private ListView listView;
-    private List<CourseData> mData;
-    private CourseAdapter courseAdapter;
-
+public class Fragment_left extends Fragment {
     private final int REFRESH_COMPLETE = 5;
-
     @Override
     public void onResume() {
         super.onResume();
@@ -58,24 +53,12 @@ public class Tab_1 extends Fragment {
         materialCalendarView.setDateSelected(materialCalendarView.getSelectedDate().getCalendar(),false);
         materialCalendarView.setDateSelected(c,true);
         changeList(c);
-
-        getActivity().findViewById(R.id.app_bar).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar c = Calendar.getInstance();
-                c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-                MaterialCalendarView materialCalendarView = (MaterialCalendarView) getActivity().findViewById(R.id.calendarView);
-                materialCalendarView.setDateSelected(materialCalendarView.getSelectedDate().getCalendar(),false);
-                materialCalendarView.setDateSelected(c,true);
-                changeList(c);
-            }
-        });
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.tab_1,container,false);
+        final View v = inflater.inflate(R.layout.pager_left,container,false);
         MaterialCalendarView materialCalendarView = (MaterialCalendarView) v.findViewById(R.id.calendarView);
         materialCalendarView.setSelectionColor(0xFF1A89F3);
         materialCalendarView.state().edit()
@@ -107,17 +90,13 @@ public class Tab_1 extends Fragment {
         layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
-                final String username = pref.getString("sno","");
-                final String password = pref.getString("pwd","");
-
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         OkHttpClient mOkHttpClient = new OkHttpClient();
+                        SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
                         final Request request = new Request.Builder()
-                                .url("http://www.aufe.me/jwc/table_all.php?sno="+username+"&pwd="+password)
+                                .url("http://www.aufe.me/jwc/table_all.php?sno="+pref.getString("sno","")+"&pwd="+pref.getString("pwd",""))
                                 .build();
 
                         Call call = mOkHttpClient.newCall(request);
@@ -126,8 +105,8 @@ public class Tab_1 extends Fragment {
                             public void onFailure(Call call, IOException e) {
                                 e.printStackTrace();
                                 LinearLayout l = (LinearLayout)getActivity().findViewById(R.id.activity_main);
-                                Snackbar snackbar = Snackbar.make(l, "Regresh Failed", 1000);
-                                snackbar.getView().setBackgroundColor(0xFF00BFFF);
+                                Snackbar snackbar = Snackbar.make(l, "数据更新失败！", 1000);
+                                snackbar.getView().setBackgroundColor(0xFFD34949);
                                 snackbar.show();
                                 handler.sendEmptyMessage(REFRESH_COMPLETE);
                             }
@@ -143,8 +122,8 @@ public class Tab_1 extends Fragment {
                                 }
                                 editor.apply();
                                 editor.commit();
-                                LinearLayout l = (LinearLayout)getActivity().findViewById(R.id.activity_main);
-                                Snackbar snackbar = Snackbar.make(l, "Regresh Complete", 1000);
+                                LinearLayout linearLayout = (LinearLayout)getActivity().findViewById(R.id.activity_main);
+                                Snackbar snackbar = Snackbar.make(linearLayout, "数据更新成功！", 1000);
                                 snackbar.getView().setBackgroundColor(0xFF00BFFF);
                                 snackbar.show();
                                 handler.sendEmptyMessage(REFRESH_COMPLETE);
@@ -159,114 +138,44 @@ public class Tab_1 extends Fragment {
 
     private void changeList(Calendar c) {
         SharedPreferences pref = getActivity().getSharedPreferences("data",MODE_PRIVATE);
-        String re="";
-        switch (c.get(Calendar.DAY_OF_WEEK)-1){
-            case 1:
-                re= pref.getString("MON","1");
-                break;
-            case 2:
-                re= pref.getString("TUE","1");
-                break;
-            case 3:
-                re= pref.getString("WED","1");
-                break;
-            case 4:
-                re= pref.getString("THU","1");
-                break;
-            case 5:
-                re= pref.getString("FRI","1");
-                break;
-            case 6:
-                re= pref.getString("SAT","1");
-                break;
-            case 0:
-                re= pref.getString("SUN","1");
-                break;
+        String[] weekday = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
+        String re = pref.getString(weekday[c.get(Calendar.DAY_OF_WEEK)-1],"1");
 
-        }
+        List<CourseData> mData = new ArrayList<>();
 
-        mData=null;
-        mData = new ArrayList<CourseData>();
-        CourseData courseData;
         JsonParser jp = new JsonParser();
         JsonObject jsonObject = (JsonObject) jp.parse(re);
-        Gson gson = new Gson();
-        Course course;
 
-        course = gson.fromJson(jsonObject.get("one"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
+        Course course;
+        CourseData courseData;
+        Gson gson = new Gson();
+        String[] week =  {"one","two","three","four","five"};
+        for(int i=0;i<5;i++){
+            course = gson.fromJson(jsonObject.get(week[i]), Course.class);
+            if(course!=null){
+                courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
+                mData.add(courseData);
+            }
         }
-        course = gson.fromJson(jsonObject.get("two"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("three"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("four"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        course = gson.fromJson(jsonObject.get("five"), Course.class);
-        if(course!=null){
-            Log.d("course",course.getName());
-            courseData = new CourseData(course.getName(),praseCourseTime(course.getOrder()+course.getLength()),course.getBuilding()+course.getRoom());
-            mData.add(courseData);
-        }
-        courseAdapter = new CourseAdapter(getContext(),mData);
-        listView = (ListView) getActivity().findViewById(R.id.listView);
+        CourseAdapter courseAdapter = new CourseAdapter(getContext(),mData);
+        ListView listView = (ListView) getActivity().findViewById(R.id.listView);
         listView.setAdapter(courseAdapter);
     }
 
     public String praseCourseTime(String s){
-        String result=null;
-        switch (s){
-            case "12":
-                result = "上午 7:30 - 9:05";
-                break;
-            case "32":
-                result = "上午 9:35 - 11:10";
-                break;
-            case "33":
-                result = "上午 9:35 - 12:00";
-                break;
-            case "62":
-                result = "下午 13:30 - 15:05";
-                break;
-            case "82":
-                result = "下午 15:35 - 17:10";
-                break;
-            case "83":
-                result = "下午 15:35 - 16:00";
-                break;
-            case "112":
-                result = "晚上 19:00 - 20:35";
-                break;
-            case "113":
-                result = "晚上 19:00 - 21:25";
-                break;
-            case "14":
-                result = "上午 07:30 - 11:10";
-                break;
-            case "15":
-                result = "上午 07:30 - 12:00";
-                break;
-            case "64":
-                result = "下午 13:30 - 17:10";
-                break;
-            case "65":
-                result = "下午 13:30 - 18:00";
-        }
-        return result;
+        HashMap<String,String> hashmap = new HashMap<String,String>();
+        hashmap.put("12","上午 7:30 - 9:05");
+        hashmap.put("32","上午 9:35 - 11:10");
+        hashmap.put("33","上午 9:35 - 12:00");
+        hashmap.put("62","下午 13:30 - 15:05");
+        hashmap.put("82","下午 15:35 - 17:10");
+        hashmap.put("83","下午 15:35 - 16:00");
+        hashmap.put("112","晚上 19:00 - 20:35");
+        hashmap.put("113","晚上 19:00 - 21:25");
+        hashmap.put("14","上午 07:30 - 11:10");
+        hashmap.put("15","上午 07:30 - 12:00");
+        hashmap.put("64","下午 13:30 - 17:10");
+        hashmap.put("65","下午 13:30 - 18:00");
+        return hashmap.get(s);
     }
 }

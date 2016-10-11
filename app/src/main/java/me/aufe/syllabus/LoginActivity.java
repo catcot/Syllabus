@@ -136,10 +136,6 @@ public class LoginActivity extends Activity {
                                         editor.putString(list[i],r[i]);
                                     }
                                     editor.apply();
-                                    editor.commit();
-
-
-
                                     handler.sendEmptyMessage(1);
                                 }
                             });
